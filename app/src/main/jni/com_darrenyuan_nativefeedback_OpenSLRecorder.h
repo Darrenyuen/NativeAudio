@@ -51,7 +51,7 @@ JNIEXPORT jboolean JNICALL
 Java_com_darrenyuan_nativefeedback_OpenSLRecorder_createAudioRecorder(JNIEnv *env, jobject thiz);
 
 JNIEXPORT void JNICALL
-Java_com_darrenyuan_nativefeedback_OpenSLRecorder_startRecord(JNIEnv *env, jobject thiz);
+Java_com_darrenyuan_nativefeedback_OpenSLRecorder_startRecord(JNIEnv *env, jobject thiz, jstring desPath);
 
 JNIEXPORT void JNICALL
 Java_com_darrenyuan_nativefeedback_OpenSLRecorder_shutDown(JNIEnv *env, jobject thiz);

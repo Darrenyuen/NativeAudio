@@ -8,6 +8,7 @@
 #include <assert.h>
 #include <android/log.h>
 #include <pthread.h>
+#include <fstream>
 
 #include "com_darrenyuan_nativefeedback_OpenSLRecorder.h"
 
@@ -45,6 +46,7 @@ static SLAndroidSimpleBufferQueueItf recorderBufferQueue;
 #define RECORDER_FRAMES (44100 * 5)
 static short recorderBuffer[RECORDER_FRAMES];
 static unsigned recorderSize = 0;
+static const char* pcmDstPathPtr;
 
 #ifdef __cplusplus
 extern "C" {
@@ -114,6 +116,12 @@ void bqRecorderCallback(SLAndroidSimpleBufferQueueItf bq, void* context) {
         recorderSize = RECORDER_FRAMES * sizeof(short);
         LOGI("bqRecorderCallback fill 5s's buffer,sizeof short is %d,  buffer size is %d", sizeof(short), recorderSize);
     }
+    // 将录得的数据写入文件
+    std::fstream outputFs;
+    outputFs.open(pcmDstPathPtr, std::ios_base::out);
+    outputFs.write(reinterpret_cast<const char *>(recorderBuffer), RECORDER_FRAMES * sizeof(short));
+    LOGI("write pcm data done");
+    assert(SL_RESULT_SUCCESS == result);
     pthread_mutex_unlock(&audioEngineLock);
 }
 
@@ -182,9 +190,11 @@ Java_com_darrenyuan_nativefeedback_OpenSLRecorder_createAudioRecorder(JNIEnv *en
 }
 
 JNIEXPORT void JNICALL
-Java_com_darrenyuan_nativefeedback_OpenSLRecorder_startRecord(JNIEnv *env, jobject thiz)
+Java_com_darrenyuan_nativefeedback_OpenSLRecorder_startRecord(JNIEnv *env, jobject thiz, jstring desPath)
 {
-    LOGI("startRecord");
+    pcmDstPathPtr = env->GetStringUTFChars(desPath, NULL);
+    LOGI("startRecord pcmDstPathPtr' value is %s", pcmDstPathPtr);
+
     SLresult result;
 
     if (pthread_mutex_trylock(&audioEngineLock)) {
