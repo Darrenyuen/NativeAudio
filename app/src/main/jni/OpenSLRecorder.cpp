@@ -5,7 +5,7 @@
 #include <SLES/OpenSLES.h>
 #include <SLES/OpenSLES_Android.h>
 
-#include <assert.h>
+#include <cassert>
 #include <android/log.h>
 #include <pthread.h>
 #include <fstream>
@@ -55,7 +55,7 @@ static jint bqPlayerBufSize = 0;
 static short* resampleBuf = NULL;
 
 // pointer and size of the next player buffer to enqueue
-const int PLAYER_BUFFER_COUNT = 5;
+const int PLAYER_BUFFER_COUNT = 50;
 const int BUFFER_SIZE = 1024;
 static unsigned char *playerBuffers = NULL;
 std::fstream inputFs;
@@ -277,6 +277,7 @@ void bqPlayerCallback(SLAndroidSimpleBufferQueueItf bq, void* context) {
     char inBuffer[BUFFER_SIZE * PLAYER_BUFFER_COUNT] = {0};
 //    inputFs.read(tempBuffer, BUFFER_SIZE * PLAYER_BUFFER_COUNT);
 //    inputFs.read(tempBuffer, BUFFER_SIZE * PLAYER_BUFFER_COUNT);
+    // todo darrenyuen 每段buffer间存在杂音
     if (inputFs.read(inBuffer, sizeof(inBuffer))) {
         counter++;
         LOGI("size of buffer is %d, counter is %d", sizeof(inBuffer), counter);
@@ -355,32 +356,32 @@ Java_com_darrenyuan_nativefeedback_OpenSLEngine_startPlay(JNIEnv *env, jobject t
 //    }
     SLDataSource audioSrc = {&loc_bufq, &format_pcm};
 
-    // create output mix
-    result = (*engineEngine)->CreateOutputMix(engineEngine, &outputMixObject, 0, NULL, NULL);
-    if (SL_RESULT_SUCCESS != result) {
-        LOGI("engineEngine.CreateOutputMix failed: %d", result);
-    }
-
-    // realize the output mix
-    result = (*outputMixObject)->Realize(outputMixObject, SL_BOOLEAN_FALSE);
-    if (SL_RESULT_SUCCESS != result) {
-        LOGI("engineEngine.Realize failed: %d", result);
-    }
-
     // configure audio sink
     SLDataLocator_OutputMix loc_outmix = {SL_DATALOCATOR_OUTPUTMIX,
                                           outputMixObject};
-    SLDataSink audioSnk = {&loc_outmix, nullptr};
+    SLDataSink audioSnk = {&loc_outmix, NULL};
+
+    // create output mix
+//    result = (*engineEngine)->CreateOutputMix(engineEngine, &outputMixObject, 0, NULL, NULL);
+//    if (SL_RESULT_SUCCESS != result) {
+//        LOGI("engineEngine.CreateOutputMix failed: %d", result);
+//    }
+
+    // realize the output mix
+//    result = (*outputMixObject)->Realize(outputMixObject, SL_BOOLEAN_FALSE);
+//    if (SL_RESULT_SUCCESS != result) {
+//        LOGI("engineEngine.Realize failed: %d", result);
+//    }
 
     /*
      * create audio player:
      *     fast audio does not support when SL_IID_EFFECTSEND is required, skip it
      *     for fast audio case
      */
-    const SLInterfaceID ids[2] = {
-            SL_IID_BUFFERQUEUE, SL_IID_VOLUME,
+    const SLInterfaceID ids[3] = {
+            SL_IID_BUFFERQUEUE, SL_IID_VOLUME, SL_IID_EFFECTSEND,
             /*SL_IID_MUTESOLO,*/};
-    const SLboolean req[2] = {SL_BOOLEAN_TRUE, SL_BOOLEAN_TRUE,
+    const SLboolean req[3] = {SL_BOOLEAN_TRUE, SL_BOOLEAN_TRUE, SL_BOOLEAN_TRUE,
             /*SL_BOOLEAN_TRUE,*/};
 
     result =
@@ -425,14 +426,14 @@ Java_com_darrenyuan_nativefeedback_OpenSLEngine_startPlay(JNIEnv *env, jobject t
 //        LOGI("get SL_IID_EFFECTSEND interface success");
 //        (void)result;
 //    }
-
-#if 0  // mute/solo is not supported for sources that are known to be mono, as
-    // this is
-    // get the mute/solo interface
-    result = (*bqPlayerObject)->GetInterface(bqPlayerObject, SL_IID_MUTESOLO, &bqPlayerMuteSolo);
-    assert(SL_RESULT_SUCCESS == result);
-    (void)result;
-#endif
+//
+//#if 0  // mute/solo is not supported for sources that are known to be mono, as
+//    // this is
+//    // get the mute/solo interface
+//    result = (*bqPlayerObject)->GetInterface(bqPlayerObject, SL_IID_MUTESOLO, &bqPlayerMuteSolo);
+//    assert(SL_RESULT_SUCCESS == result);
+//    (void)result;
+//#endif
 
     // get the volume interface
     result = (*bqPlayerObject)
@@ -461,7 +462,9 @@ Java_com_darrenyuan_nativefeedback_OpenSLEngine_startPlay(JNIEnv *env, jobject t
 
 JNIEXPORT void JNICALL
 Java_com_darrenyuan_nativefeedback_OpenSLEngine_stopPlay(JNIEnv *env, jobject thiz) {
-
+    LOGI("stop play");
+    SLresult result = (*bqPlayerPlay)->SetPlayState(bqPlayerPlay, SL_PLAYSTATE_STOPPED);
+    assert(result == SL_RESULT_SUCCESS);
 }
 
 void Java_com_darrenyuan_nativefeedback_OpenSLEngine_shutDown(JNIEnv *env, jobject thiz) {
@@ -493,6 +496,8 @@ void Java_com_darrenyuan_nativefeedback_OpenSLEngine_shutDown(JNIEnv *env, jobje
         free(playerBuffers);
         playerBuffers = NULL;
     }
+
+    inputFs.close();
 
     pthread_mutex_destroy(&audioEngineLock);
 }
