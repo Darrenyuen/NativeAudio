@@ -17,6 +17,7 @@ project("medianative")
 file(GLOB COMMON_SRC_LIST
         ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp)
 
+# 将${COMMON_SRC_LIST}下的cpp文件编译生成libmedianative.so
 add_library( # Sets the name of the library.
         medianative
 
@@ -48,4 +49,5 @@ target_link_libraries( # Specifies the target library.
 
         # Links the target library to the log library
         # included in the NDK.
-        ${log-lib})
+        ${log-lib}
+        OpenSLES)
