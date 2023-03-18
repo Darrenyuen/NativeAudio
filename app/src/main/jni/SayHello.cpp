@@ -3,7 +3,7 @@
 //
 #include "com_darrenyuan_nativefeedback_JniTest.h"
 
-JNIEXPORT jstring JNICALL Java_com_darrenyuan_nativefeedback_JniTest_sayHello
+extern "C" JNIEXPORT jstring JNICALL Java_com_darrenyuan_nativefeedback_JniTest_sayHello
   (JNIEnv *env, jobject obj)
 {
     return env->NewStringUTF("我是C++定义的String");
