@@ -17,8 +17,8 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <Button
-        android:id="@+id/start"
-        android:text="start"
+        android:id="@+id/start_record"
+        android:text="StartRecord"
         android:textAllCaps="false"
         app:layout_constraintLeft_toLeftOf="@+id/hello_tv"
         app:layout_constraintRight_toRightOf="@+id/hello_tv"
@@ -27,12 +27,32 @@
         android:layout_height="wrap_content"/>
 
     <Button
-        android:id="@+id/stop"
-        android:text="stop"
+        android:id="@+id/stop_record"
+        android:text="StopRecord"
         android:textAllCaps="false"
         app:layout_constraintLeft_toLeftOf="@+id/hello_tv"
         app:layout_constraintRight_toRightOf="@+id/hello_tv"
-        app:layout_constraintTop_toBottomOf="@+id/start"
+        app:layout_constraintTop_toBottomOf="@+id/start_record"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+    <Button
+        android:id="@+id/start_play"
+        android:text="StartPlay"
+        android:textAllCaps="false"
+        app:layout_constraintLeft_toLeftOf="@+id/hello_tv"
+        app:layout_constraintRight_toRightOf="@+id/hello_tv"
+        app:layout_constraintTop_toBottomOf="@+id/stop_record"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+    <Button
+        android:id="@+id/stop_play"
+        android:text="StopPlay"
+        android:textAllCaps="false"
+        app:layout_constraintLeft_toLeftOf="@+id/hello_tv"
+        app:layout_constraintRight_toRightOf="@+id/hello_tv"
+        app:layout_constraintTop_toBottomOf="@+id/start_play"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>
 

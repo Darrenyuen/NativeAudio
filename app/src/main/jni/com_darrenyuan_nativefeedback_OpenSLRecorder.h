@@ -48,17 +48,22 @@ JNIEXPORT jint JNICALL Java_com_darrenyuan_nativefeedback_OpenSLRecorder_nativeS
   (JNIEnv *, jobject);
 
 JNIEXPORT jboolean JNICALL
-Java_com_darrenyuan_nativefeedback_OpenSLRecorder_createAudioRecorder(JNIEnv *env, jobject thiz);
+Java_com_darrenyuan_nativefeedback_OpenSLEngine_createAudioRecorder(JNIEnv *env, jobject thiz);
 
 JNIEXPORT void JNICALL
-Java_com_darrenyuan_nativefeedback_OpenSLRecorder_startRecord(JNIEnv *env, jobject thiz, jstring desPath);
+Java_com_darrenyuan_nativefeedback_OpenSLEngine_startRecord(JNIEnv *env, jobject thiz, jstring desPath);
 
 JNIEXPORT void JNICALL
-Java_com_darrenyuan_nativefeedback_OpenSLRecorder_shutDown(JNIEnv *env, jobject thiz);
+Java_com_darrenyuan_nativefeedback_OpenSLEngine_shutDown(JNIEnv *env, jobject thiz);
 
-extern "C"
 JNIEXPORT void JNICALL
-Java_com_darrenyuan_nativefeedback_OpenSLRecorder_stopRecord(JNIEnv *env, jobject thiz);
+Java_com_darrenyuan_nativefeedback_OpenSLEngine_stopRecord(JNIEnv *env, jobject thiz);
+
+JNIEXPORT void JNICALL
+Java_com_darrenyuan_nativefeedback_OpenSLEngine_startPlay(JNIEnv *env, jobject thiz, jstring srcFilePath);
+
+JNIEXPORT void JNICALL
+Java_com_darrenyuan_nativefeedback_OpenSLEngine_stopPlay(JNIEnv *env, jobject thiz);
 
 #ifdef __cplusplus
 }
